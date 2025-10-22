@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>爱心经期记录 - 情侣健康管理</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 加载提示 -->
+    <div id="loader" class="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- 顶部导航 -->
+    <nav class="main-nav">
+        <button id="btn-main" class="nav-btn">
+            <i class="fas fa-calendar"></i> 经期记录
+        </button>
+        <button id="btn-couple" class="nav-btn">
+            <i class="fas fa-heart"></i> 情侣互动
+        </button>
+        <button id="btn-me" class="nav-btn">
+            <i class="fas fa-user"></i> 我的
+        </button>
+    </nav>
+
+    <!-- 身份验证界面 -->
+    <div id="auth-page" class="page active">
+        <div class="page-container">
+            <div class="auth-card">
+                <div class="app-logo">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h2>爱心经期记录</h2>
+                <p class="auth-desc">记录经期，关爱彼此，让爱情更甜蜜</p>
+                
+                <div class="form-group">
+                    <label for="user-name">你的昵称</label>
+                    <input type="text" id="user-name" placeholder="请输入昵称" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="couple-code">情侣码（选填）</label>
+                    <input type="text" id="couple-code" placeholder="加入现有情侣关系" class="form-input">
+                </div>
+                <button id="enter-btn" class="primary-btn">进入应用</button>
+                <p class="info-text">没有情侣码？点击进入将自动创建新关系</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主界面（经期记录） -->
+    <div id="main-page" class="page">
+        <div class="page-container">
+            <div class="identity-tabs">
+                <button id="identity-self" class="identity-btn active">自己</button>
+                <button id="identity-partner" class="identity-btn">伴侣</button>
+            </div>
+
+            <!-- 日历区域 -->
+            <div class="card calendar-card">
+                <div class="calendar-header">
+                    <button id="prev-month" class="month-btn">
+                        <i class="fas fa-chevron-left"></i> 上月
+                    </button>
+                    <h3 id="current-month">2025年10月</h3>
+                    <button id="next-month" class="month-btn">
+                        下月 <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="weekdays">
+                    <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+                </div>
+                <div class="days" id="calendar-days"></div>
+                <div class="calendar-legend">
+                    <span><i class="fas fa-circle" style="color:#d32f2f"></i> 经期</span>
+                    <span><i class="fas fa-circle" style="color:#4caf50"></i> 排卵期</span>
+                    <span id="selected-date" class="selected-date">选中日期：未选择</span>
+                </div>
+            </div>
+
+            <!-- 记录表单 -->
+            <div class="card form-card">
+                <h3><i class="fas fa-plus-circle"></i> 添加记录</h3>
+                <div class="form-group">
+                    <label for="start-date">开始日期</label>
+                    <input type="date" id="start-date" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="end-date">结束日期</label>
+                    <input type="date" id="end-date" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="symptoms">症状描述</label>
+                    <input type="text" id="symptoms" placeholder="例如：腹痛、疲劳、情绪波动" class="form-input">
+                </div>
+                <button id="save-record" class="primary-btn">保存记录</button>
+                <p id="record-message" class="message"></p>
+            </div>
+
+            <!-- 周期分析 -->
+            <div class="card analysis-card">
+                <h3><i class="fas fa-chart-line"></i> 周期分析</h3>
+                <div id="analysis-result" class="analysis-content">
+                    请添加至少2条记录查看分析
+                </div>
+            </div>
+
+            <!-- 历史记录 -->
+            <div class="card history-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> 历史记录</h3>
+                    <div class="history-actions">
+                        <button id="export-data" class="secondary-btn"><i class="fas fa-download"></i></button>
+                        <button id="import-data-btn" class="secondary-btn"><i class="fas fa-upload"></i></button>
+                        <input type="file" id="import-data" accept=".csv" style="display:none;">
+                    </div>
+                </div>
+                <div id="history-list" class="history-content">
+                    暂无记录
+                </div>
+                <button id="clear-data" class="text-btn danger-btn">清除所有记录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 情侣互动界面 -->
+    <div id="couple-page" class="page">
+        <div class="page-container">
+            <!-- 恋爱等级卡片 -->
+            <div class="card love-level-card">
+                <div class="level-info">
+                    <div class="level-icon" id="level-icon">❤️</div>
+                    <div class="level-text">
+                        <h3>恋爱等级 <span id="love-level">Lv1</span></h3>
+                        <p id="level-privilege">特权：基础互动、每日签到</p>
+                    </div>
+                </div>
+                <div class="love-progress-container">
+                    <div class="love-progress" id="love-progress"></div>
+                </div>
+                <div class="love-value">
+                    <span id="current-love">20</span> / <span id="next-level-love">100</span> 恋爱值
+                </div>
+            </div>
+
+            <!-- 情侣信息 -->
+            <div class="card couple-info-card">
+                <h3><i class="fas fa-id-card"></i> 情侣信息</h3>
+                <div class="couple-code-section">
+                    <p>你的情侣码</p>
+                    <div class="sync-code-display" id="couple-code-display">ABC123</div>
+                    <button id="copy-code" class="secondary-btn small-btn">复制</button>
+                </div>
+                <p class="info-text">分享此码给伴侣，双方即可同步数据</p>
+                <p>当前伴侣：<span id="partner-name" class="partner-name">未绑定</span></p>
+                <button id="sync-data" class="secondary-btn">
+                    <i class="fas fa-sync"></i> 同步数据
+                </button>
+            </div>
+
+            <!-- 日常互动 -->
+            <div class="card interaction-card">
+                <h3><i class="fas fa-hand-holding-heart"></i> 日常互动</h3>
+                <div class="interaction-grid">
+                    <button id="daily-checkin" class="interaction-btn">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>每日签到</span>
+                        <span class="reward">+5</span>
+                    </button>
+                    <button id="send-care" class="interaction-btn">
+                        <i class="fas fa-heart"></i>
+                        <span>发送关心</span>
+                        <span class="reward">+8</span>
+                    </button>
+                    <button id="add-anniversary" class="interaction-btn" data-level="2">
+                        <i class="fas fa-star"></i>
+                        <span>纪念日</span>
+                        <span class="reward">+15</span>
+                    </button>
+                    <button id="period-tips" class="interaction-btn" data-level="2">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>经期关怀</span>
+                        <span class="reward">+3</span>
+                    </button>
+                    <button id="send-gift" class="interaction-btn" data-level="3">
+                        <i class="fas fa-gift"></i>
+                        <span>赠送礼物</span>
+                        <span class="reward">+20</span>
+                    </button>
+                    <button id="write-diary" class="interaction-btn" data-level="3">
+                        <i class="fas fa-book"></i>
+                        <span>爱情日记</span>
+                        <span class="reward">+12</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 任务中心 -->
+            <div class="card tasks-card">
+                <h3><i class="fas fa-list-check"></i> 情侣任务</h3>
+                <p class="info-text">完成任务可获得额外恋爱值</p>
+                <div id="tasks-list" class="tasks-list">
+                    <div class="task-item">
+                        <input type="checkbox" id="task1" disabled>
+                        <label for="task1">同步经期记录（+15恋爱值）</label>
+                    </div>
+                    <div class="task-item">
+                        <input type="checkbox" id="task2" disabled>
+                        <label for="task2">添加纪念日（+20恋爱值）</label>
+                    </div>
+                    <div class="task-item">
+                        <input type="checkbox" id="task3" disabled>
+                        <label for="task3">连续签到7天（+30恋爱值）</label>
+                    </div>
+                    <div class="task-item">
+                        <input type="checkbox" id="task4" disabled>
+                        <label for="task4">写3篇爱情日记（+40恋爱值）</label>
+                    </div>
+                    <div class="task-item">
+                        <input type="checkbox" id="task5" disabled>
+                        <label for="task5">双方记录完整周期（+50恋爱值）</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 爱情成就 -->
+            <div class="card achievements-card">
+                <h3><i class="fas fa-trophy"></i> 爱情成就</h3>
+                <div id="achievements-list" class="achievements-list">
+                    <div class="achievement-item locked">
+                        <i class="fas fa-lock"></i>
+                        <div>
+                            <div class="achievement-title">初恋萌芽</div>
+                            <div class="achievement-desc">恋爱等级达到1级</div>
+                        </div>
+                        <span class="reward">+25</span>
+                    </div>
+                    <div class="achievement-item locked">
+                        <i class="fas fa-lock"></i>
+                        <div>
+                            <div class="achievement-title">亲密无间</div>
+                            <div class="achievement-desc">恋爱等级达到3级</div>
+                        </div>
+                        <span class="reward">+50</span>
+                    </div>
+                    <div class="achievement-item locked">
+                        <i class="fas fa-lock"></i>
+                        <div>
+                            <div class="achievement-title">爱情长跑</div>
+                            <div class="achievement-desc">连续互动30天</div>
+                        </div>
+                        <span class="reward">+100</span>
+                    </div>
+                    <div class="achievement-item locked">
+                        <i class="fas fa-lock"></i>
+                        <div>
+                            <div class="achievement-title">完美伴侣</div>
+                            <div class="achievement-desc">完成所有情侣任务</div>
+                        </div>
+                        <span class="reward">+150</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 互动记录 -->
+            <div class="card records-card">
+                <h3><i class="fas fa-comments"></i> 互动记录</h3>
+                <div id="interaction-list" class="interaction-list">
+                    暂无互动，开始你们的甜蜜互动吧~
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人中心界面 -->
+    <div id="me-page" class="page">
+        <div class="page-container">
+            <div class="card profile-card">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-info">
+                    <h3 id="user-name-display">用户名</h3>
+                    <p>情侣码: <span id="my-couple-code">--</span></p>
+                </div>
+                <button id="logout-btn" class="secondary-btn">退出登录</button>
+            </div>
+
+            <!-- 提醒设置 -->
+            <div class="card reminder-card">
+                <h3><i class="fas fa-bell"></i> 提醒设置</h3>
+                <div class="setting-item">
+                    <label class="setting-label">
+                        <input type="checkbox" id="enable-reminder"> 开启提醒
+                    </label>
+                </div>
+                <div id="reminder-options" class="reminder-options">
+                    <div class="setting-item">
+                        <label class="setting-label">经期提前提醒</label>
+                        <select id="period-advance" class="form-select">
+                            <option value="1">1天</option>
+                            <option value="2">2天</option>
+                            <option value="3" selected>3天</option>
+                            <option value="5">5天</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="ovulation-reminder" checked> 排卵期提醒
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="anniversary-reminder" checked> 纪念日提醒
+                        </label>
+                    </div>
+                    <button id="save-reminder" class="primary-btn">保存设置</button>
+                </div>
+            </div>
+
+            <!-- 数据管理 -->
+            <div class="card data-card">
+                <h3><i class="fas fa-database"></i> 数据管理</h3>
+                <button id="export-all" class="text-btn">
+                    <i class="fas fa-download"></i> 导出所有数据
+                </button>
+                <button id="import-all" class="text-btn">
+                    <i class="fas fa-upload"></i> 导入所有数据
+                </button>
+                <input type="file" id="import-all-data" accept=".json" style="display:none;">
+                <button id="clear-all" class="text-btn danger-btn">
+                    <i class="fas fa-trash"></i> 清除所有数据
+                </button>
+            </div>
+
+            <!-- 关于 -->
+            <div class="card about-card">
+                <h3><i class="fas fa-info-circle"></i> 关于</h3>
+                <p class="version-info">版本: v1.0.0</p>
+                <p class="app-desc">爱心经期记录，让情侣间更了解彼此，关爱对方健康</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗组件 -->
+    <div id="care-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-heart"></i> 发送关心</h3>
+            <textarea id="care-content" placeholder="输入想对她说的话..." class="form-input"></textarea>
+            <div class="modal-actions">
+                <button id="send-care-confirm" class="primary-btn">发送</button>
+                <button class="modal-close secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="anniversary-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-star"></i> 添加纪念日</h3>
+            <input type="date" id="anniversary-date" class="form-input">
+            <input type="text" id="anniversary-name" placeholder="例如：第一次约会、相识纪念日" class="form-input">
+            <div class="modal-actions">
+                <button id="save-anniversary" class="primary-btn">保存</button>
+                <button class="modal-close secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gift-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-gift"></i> 赠送礼物</h3>
+            <input type="text" id="gift-name" placeholder="礼物名称" class="form-input">
+            <textarea id="gift-message" placeholder="想说的话..." class="form-input"></textarea>
+            <div class="modal-actions">
+                <button id="send-gift-confirm" class="primary-btn">赠送</button>
+                <button class="modal-close secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="diary-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-book"></i> 爱情日记</h3>
+            <input type="text" id="diary-title" placeholder="日记标题" class="form-input">
+            <textarea id="diary-content" placeholder="记录你们的美好瞬间..." class="form-input"></textarea>
+            <div class="modal-actions">
+                <button id="save-diary" class="primary-btn">保存</button>
+                <button class="modal-close secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-edit"></i> 编辑记录</h3>
+            <input type="hidden" id="edit-index">
+            <input type="date" id="edit-start" class="form-input">
+            <input type="date" id="edit-end" class="form-input">
+            <input type="text" id="edit-symptoms" placeholder="症状描述" class="form-input">
+            <div class="modal-actions">
+                <button id="save-edit" class="primary-btn">保存</button>
+                <button class="modal-close secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知提示 -->
+    <div id="toast" class="toast">操作成功</div>
+
+    <!-- 等级提升动画 -->
+    <div id="level-up" class="level-up-animation">升级啦！</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
